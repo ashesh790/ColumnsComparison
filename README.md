@@ -1,398 +1,404 @@
-# Advanced Filter Fields Comparison: Collection Manager vs Shopify FMS
+# AdvancedFilter Comparison: Collection Manager vs FMS
 
-This document compares the advanced filter fields available in the **Collection Manager** and **Shopify FMS** repositories.
+This document provides a comprehensive comparison of columns and operators available in Collection Manager's AdvancedFilter and FMS (Filter Management System).
 
-## Overview
-
-- **Collection Manager**: Uses a rule-based filtering system with fields defined in `instance/advanced_filter/constants.py` and supports both product and collection filtering.
-- **Shopify FMS**: Uses two filtering systems:
-  - **Shopify Search Filters**: Direct queries to Shopify GraphQL API
-  - **Parquet Filters**: Queries against parquet files stored in S3
+## Table of Contents
+1. [Operators Comparison](#operators-comparison)
+2. [Columns/Fields Comparison](#columnsfields-comparison)
+3. [Visual Comparison Matrix](#visual-comparison-matrix)
 
 ---
 
-## Collection Manager - Advanced Filter Fields
+## Operators Comparison
 
-### Product Filter Fields
+### Collection Manager AdvancedFilter Operators
 
-The Collection Manager supports the following filter fields for products (as defined in `RULE_COLUMN`):
+| User Display | System Value | Description |
+|--------------|--------------|-------------|
+| is equal to | == | Equality check |
+| is not equal to | != | Inequality check |
+| is greater than | > | Greater than comparison |
+| is less than | < | Less than comparison |
+| contains | contains | String contains check |
+| doesn't contain | not contain | String does not contain |
+| is in the last | > | Date is in the last X days |
+| is not in the last | < | Date is not in the last X days |
+| starts with | starts with | String starts with |
+| ends with | ends with | String ends with |
+| in the top | in the top | Top N items |
+| in the bottom | in the bottom | Bottom N items |
+| is not empty | is set | Field is not null/empty |
+| is empty | is not set | Field is null/empty |
+| between | between | Range between two values |
 
-| Field Name | Display Name | Type | Notes |
-|------------|--------------|------|-------|
-| `buy_to_view` | Buy to view | Analytics | Conversion metric |
-| `buy_to_checkout` | Buy to checkout | Analytics | Conversion metric |
-| `buy_to_cart` | Buy to cart | Analytics | Conversion metric |
-| `checkout_to_view` | Checkout to view | Analytics | Conversion metric |
-| `checkout_to_cart` | Checkout to cart | Analytics | Conversion metric |
-| `cart_to_view` | Cart to view | Analytics | Conversion metric |
-| `checkouts` | Checkouts | Analytics | Google Analytics metric |
-| `add_to_carts` | Add to carts | Analytics | Google Analytics metric |
-| `views` | Views | Analytics | Google Analytics metric |
-| `revenue` | Revenue | Analytics | Order-based metric |
-| `products_sold` | Products sold | Analytics | Order-based metric |
-| `created_at` | Created date | Date | Product creation date |
-| `published_at` | Published date | Date | Product publication date |
-| `title` | Product title | String | Product name |
-| `sku` | Product sku | String | SKU identifier |
-| `body_html` | Product description | String | Product description HTML |
-| `type` | Product type | String | Product type |
-| `vendor` | Product vendor | String | Product vendor |
-| `price` | Product price | Numeric | Product price |
-| `tags` | Product tag | String | Product tags |
-| `compare_at_price` | Compare at price | Numeric | Compare at price |
-| `variant_weight` | Weight | Numeric | Variant weight |
-| `inventory` | Inventory stock | Numeric | Total inventory |
-| `variant_title` | Variant title | String | Variant title |
-| `variant_inventory` | Variant inventory | Numeric | Variant-level inventory |
-| `discount_percent` | Discount % | Numeric | Discount percentage |
-| `discount` | Discount amount | Numeric | Discount amount |
-| `net_revenue` | Net revenue | Analytics | Net revenue after discounts |
-| `position` | Random | Numeric | Random position |
-| `new_inventory_added_date` | New inventory added date | Date | Date when inventory was added |
-| `restock_date` | Restocked date | Date | Restock date |
-| `updated_at` | Last updated date | Date | Last update timestamp |
-| `collection` | Collection title | String | Collection name |
-| `collection_handle` | Collection handle | String | Collection handle |
-| `collection_id` | Collection id | Numeric | Collection ID |
-| `variant_number` | Number of variants | Numeric | Total variant count |
-| `variant_number_available` | Number of available variants | Numeric | Available variant count |
-| `is_price_reduced` | Price reduced | Boolean | Whether price is reduced |
-| `variant_stock_ratio` | Variant stock ratio | Numeric | Stock ratio metric |
-| `cost` | Cost | Numeric | Product cost (premium plans only) |
-| `profit` | Profit | Numeric | Profit amount (premium plans only) |
-| `true_profit` | True profit | Numeric | True profit (premium plans only) |
-| `margin` | Margin | Numeric | Margin percentage (premium plans only) |
-| `true_margin` | True margin | Numeric | True margin (premium plans only) |
-| `sell_through_rate` | Sell through rate | Numeric | Sell-through rate metric |
-| `handle` | Product handle | String | Product handle |
+### FMS Operators
 
-### Supported Operators
+| Operator Name | Label | Used For |
+|---------------|-------|----------|
+| = | equals | Equality operators, Numeric, String |
+| != | not equals | Equality operators, Numeric, String |
+| < | less than | Numeric, Time operators |
+| <= | less than or equal to | Numeric, Time operators |
+| > | greater than | Numeric, Time operators |
+| >= | greater than or equal to | Numeric, Time operators |
+| contains | contains | String, Multi-select operators |
+| doesNotContain | does not contain | Multi-select operators |
+| beginsWith | begins with | String operators |
+| endsWith | ends with | String operators |
+| in | is in | Multi-select operators |
+| notIn | is not in | Multi-select operators |
+| isNull | is null | Null operators |
+| isNotNull | is not null | Null operators |
+| between | between | Range, Time operators |
+| notBetween | not between | Range, Time operators |
 
-- `is equal to` / `==`
-- `is not equal to` / `!=`
-- `is greater than` / `>`
-- `is less than` / `<`
-- `contains`
-- `doesn't contain` / `not contain`
-- `starts with`
-- `ends with`
-- `in the top`
-- `in the bottom`
-- `is not empty` / `is set`
-- `is empty` / `is not set`
-- `between`
-- `is in the last` / `>`
-- `is not in the last` / `<`
-
-### Special Field Configurations
-
-- **Collection fields**: Only support "is equal to" operator
-- **Compare at price**: Supports "is not empty" and "is empty" operators
-- **Variant inventory**: Supports special operators: "is tracked", "is not tracked", "continue selling", "not continue selling"
-- **Tags**: Different operators for smart vs custom collections
-- **Price/Weight/Inventory**: Support "in the top (%)" and "in the bottom (%)" for custom collections
+**FMS Operator Groups:**
+- **EQUALITY_OPERATORS**: =, !=
+- **NUMERIC_OPERATORS**: =, !=, <, <=, >, >=
+- **STRING_OPERATORS**: =, !=, contains, beginsWith, endsWith
+- **MULTI_SELECT_OPERATORS**: in, notIn, contains, doesNotContain
+- **BOOLEAN_OPERATORS**: =
+- **TIME_OPERATORS**: <, <=, >, >=, between, notBetween
+- **NULL_OPERATORS**: isNull, isNotNull
+- **RANGE_OPERATORS**: between, notBetween
 
 ---
 
-## Shopify FMS - Advanced Filter Fields
+## Columns/Fields Comparison
 
-### Shopify Search Filters (GraphQL API)
+### Collection Manager AdvancedFilter Columns
 
-These filters query Shopify directly via GraphQL API.
+#### Analytics & Performance Metrics
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Buy to view | buy_to_view | >, <, ==, !=, in the top, in the bottom |
+| Buy to checkout | buy_to_checkout | >, <, ==, !=, in the top, in the bottom |
+| Buy to cart | buy_to_cart | >, <, ==, !=, in the top, in the bottom |
+| Checkout to view | checkout_to_view | >, <, ==, !=, in the top, in the bottom |
+| Checkout to cart | checkout_to_cart | >, <, ==, !=, in the top, in the bottom |
+| Cart to view | cart_to_view | >, <, ==, !=, in the top, in the bottom |
+| Checkouts | checkouts | >, <, ==, !=, in the top, in the bottom |
+| Add to carts | add_to_carts | >, <, ==, !=, in the top, in the bottom |
+| Views | views | >, <, ==, !=, in the top, in the bottom |
+| Revenue | revenue | >, <, ==, !=, in the top, in the bottom |
+| Products sold | products_sold | >, <, ==, !=, in the top, in the bottom |
+| Net revenue | net_revenue | >, <, ==, !=, in the top, in the bottom |
 
-#### Product Search Fields
+#### Product Information
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Product title | title | ==, !=, contains, not contain, starts with, ends with |
+| Product sku | sku | ==, !=, contains, not contain, starts with, ends with |
+| Product description | body_html | ==, !=, contains, not contain, starts with, ends with |
+| Product type | type | ==, !=, contains, not contain, starts with, ends with |
+| Product vendor | vendor | ==, !=, contains, not contain, starts with, ends with |
+| Product tag | tags | ==, !=, contains, not contain |
+| Product price | price | ==, !=, >, <, between |
+| Compare at price | compare_at_price | ==, !=, >, <, between, is set, is not set |
+| Product handle | handle | ==, !=, contains, not contain, starts with, ends with |
 
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `barcode` | String | Product variant barcode |
-| `bundles` | Boolean | Product bundle status |
-| `category_id` | String | Product category ID |
-| `collection_id` | Numeric | Collection ID |
-| `combined_listing_role` | Select | Role in combined listing (parent/child/no_role) |
-| `created_at` | DateTime | Product creation date |
-| `delivery_profile_id` | Numeric | Delivery profile ID |
-| `error_feedback` | String | Publishing errors |
-| `gift_card` | Boolean | Is gift card |
-| `handle` | String | Product handle |
-| `has_only_composites` | Boolean | Has only composite variants |
-| `has_only_default_variant` | Boolean | Has only default variant |
-| `has_variant_with_components` | Boolean | Has variants with components |
-| `id` | Numeric | Product ID |
-| `inventory_total` | Numeric | Total inventory count |
-| `is_price_reduced` | Boolean | Price reduced status |
-| `out_of_stock_somewhere` | Boolean | Out of stock in at least one location |
-| `price` | Numeric | Variant price |
-| `product_configuration_owner` | String | App ID |
-| `product_publication_status` | String | Publication status |
-| `product_type` | String | Product type |
-| `publication_ids` | String | Publication IDs (comma-separated) |
-| `publishable_status` | Select | Publishable status |
-| `published_at` | DateTime | Publication date |
-| `published_status` | Select | Published status (unset/pending/approved/not approved) |
-| `sku` | String | Variant SKU |
-| `status` | Select | Product status (ACTIVE/ARCHIVED/DRAFT) |
-| `tag` | String | Product tag |
-| `tag_not` | String | Exclude tag |
-| `title` | String | Product title |
-| `updated_at` | DateTime | Last update date |
-| `variant_id` | Numeric | Variant ID |
-| `variant_title` | String | Variant title |
-| `vendor` | String | Product vendor |
+#### Variant Information
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Variant title | variant_title | ==, !=, contains, not contain, starts with, ends with |
+| Variant inventory | variant_inventory | ==, !=, >, <, between |
+| Weight | variant_weight | ==, !=, >, <, between |
 
-#### Collection Search Fields
+#### Inventory & Stock
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Inventory stock | inventory | ==, !=, >, <, between |
+| Number of variants | variant_number | ==, !=, >, <, between |
+| Number of available variants | variant_number_available | ==, !=, >, <, between |
+| Variant stock ratio | variant_stock_ratio | ==, !=, >, <, between |
 
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `collection_type` | Select | Collection type (custom/smart) |
-| `handle` | String | Collection handle |
-| `id` | Numeric | Collection ID |
-| `product_id` | Numeric | Product ID in collection |
-| `product_publication_status` | Select | Product publication status |
-| `publishable_status` | String | Publishable status |
-| `published_at` | DateTime | Publication date |
-| `published_status` | Select | Published status |
-| `title` | String | Collection title |
-| `updated_at` | DateTime | Last update date |
+#### Financial Metrics
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Discount % | discount_percent | ==, !=, >, <, between |
+| Discount amount | discount | ==, !=, >, <, between |
+| Cost | cost | ==, !=, >, <, between |
+| Profit | profit | ==, !=, >, <, between |
+| True profit | true_profit | ==, !=, >, <, between |
+| Margin | margin | ==, !=, >, <, between |
+| True margin | true_margin | ==, !=, >, <, between |
+| Sell through rate | sell_through_rate | ==, !=, >, <, between |
 
-#### Product Variant Search Fields
+#### Dates
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Created date | created_at | >, < (is in the last, is not in the last), between |
+| Published date | published_at | >, < (is in the last, is not in the last), between |
+| New inventory added date | new_inventory_added_date | >, < (is in the last, is not in the last), between |
+| Restocked date | restock_date | >, < (is in the last, is not in the last), between |
+| Last updated date | updated_at | >, < (is in the last, is not in the last), between |
 
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `barcode` | String | Variant barcode |
-| `delivery_profile_id` | Numeric | Delivery profile ID |
-| `exclude_composite` | Boolean | Exclude composite variants |
-| `requires_components` | Boolean | Requires components |
-| `sku` | String | Variant SKU |
-| `tag` | String | Tag |
-| `tag_not` | String | Exclude tag |
-| `taxable` | Boolean | Taxable status |
-| `title` | String | Variant title |
-| `updated_at` | Date | Update date |
-| `vendor` | String | Vendor |
+#### Collection Information
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Collection title | collection | ==, !=, contains, not contain, starts with, ends with |
+| Collection handle | collection_handle | ==, !=, contains, not contain, starts with, ends with |
+| Collection id | collection_id | ==, != |
 
-#### Location Search Fields
-
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `active` | Boolean | Active status |
-| `address1` | String | Address line 1 |
-| `address2` | String | Address line 2 |
-| `city` | String | City |
-| `country` | String | Country |
-| `created_at` | Date | Creation date |
-| `geolocated` | Boolean | Geolocated status |
-| `id` | Numeric | Location ID |
-| `latitude` | Numeric | Latitude |
-| `longitude` | Numeric | Longitude |
-| `name` | String | Location name |
-| `phone` | String | Phone number |
-| `province` | String | Province |
-| `zip` | String | ZIP code |
-
-### Parquet Search Filters (S3 Data)
-
-These filters query parquet files stored in S3.
-
-#### Product Parquet Fields
-
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `id` | String | Product ID |
-| `title` | String | Product title |
-| `handle` | String | Product handle |
-| `product_type` | Multiselect | Product type (dynamically populated) |
-| `tags` | Multiselect | Product tags (dynamically populated) |
-| `status` | Select | Product status (ACTIVE/ARCHIVED/DRAFT) |
-| `vendor` | String | Product vendor |
-| `variant_number` | Numeric | Number of variants |
-| `publications` | Multiselect | Publication IDs (dynamically populated) |
-| `inventory_total` | Numeric | Total inventory count |
-
-**Note**: Parquet product filters support joins with:
-- Orders (for `products_sold`, `revenue`, `net_revenue`)
-- Google Analytics (for `views`, `add_to_carts`, `checkouts`, `revenue`)
-- Product Variants
-- Inventory Levels
-- Locations
-
-#### Product Variant Parquet Fields
-
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `id` | String | Variant ID |
-| `title` | String | Variant title |
-| `sku` | String | Variant SKU |
-| `price` | Numeric | Variant price |
-
-**Note**: Many variant fields are commented out in the codebase (e.g., `compare_at_price`, `inventory_item_id`, `barcode`, `discount`, `profit`, `margin`, etc.)
-
-#### Collection Parquet Fields
-
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `id` | String | Collection ID |
-| `title` | String | Collection title |
-| `handle` | String | Collection handle |
-| `image` | String | Collection image URL |
-| `alt_text` | String | Image alt text |
-| `product_count` | Numeric | Number of products |
-| `products` | Text | Product IDs (CSV) |
-| `updated_at` | DateTime | Last update date |
-| `sort_order` | Select | Sort order (MANUAL/BEST_SELLING/PRICE_ASC/etc.) |
-| `template_suffix` | String | Template suffix |
-| `type` | Select | Collection type (custom/smart) |
-| `disjunctive` | Boolean | Disjunctive status |
-| `rules` | String | Collection rules (disabled) |
-| `publication_count` | Numeric | Number of publications |
-| `publications` | Text | Publication IDs (disabled) |
-
-#### Order Parquet Fields
-
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `id` | String | Order line item ID |
-| `order_id` | String | Order ID |
-| `order_created_at` | DateTime | Order creation date |
-| `order_updated_at` | DateTime | Order update date |
-| `customer_id` | String | Customer ID |
-| `product_id` | String | Product ID |
-| `collection_ids` | String | Collection IDs |
-| `variant_id` | String | Variant ID |
-| `quantity` | Numeric | Quantity ordered |
-| `price` | Numeric | Item price |
-| `price_discounted` | Numeric | Discounted price |
-| `net_price` | Numeric | Net price after discounts |
-| `products_sold` | Numeric | Products sold |
-| `revenue` | Numeric | Revenue |
-| `net_revenue` | Numeric | Net revenue |
-
-#### Location Parquet Fields
-
-| Field Name | Type | Description |
-|------------|------|-------------|
-| `id` | String | Location ID |
-| `name` | String | Location name |
-| `active` | Boolean | Active status |
-| `created_at` | DateTime | Creation date |
-| `updated_at` | DateTime | Update date |
-
-#### Other Parquet Entity Fields
-
-- **Publications**: `id`, `name`, `handle`
-- **Inventory Levels**: `id`, `location_id`, `inventory_item_id`, `quantity`, `updated_at`
-- **Google Analytics (GA)**: `time`, `item_id`, `item_name`, `item_viewed`, `item_added_to_cart`, `item_checked_out`, `item_revenue`, `views`, `add_to_carts`, `checkouts`, `revenue`
+#### Other
+| User Display | System Column | Operators |
+|--------------|---------------|-----------|
+| Random | position | (Special handling) |
+| Price reduced | is_price_reduced | ==, != |
 
 ---
 
-## Comparison Summary
+### FMS Fields
 
-### Fields Available in Both Repositories
+#### Parquet Product Fields (ParquetProductSearchFields)
+| Field Name | Label | Operators | Input Type |
+|------------|-------|-----------|------------|
+| id | id | =, != | text |
+| title | title | =, !=, contains, beginsWith, endsWith | text |
+| handle | handle | =, !=, contains, beginsWith, endsWith | text |
+| product_type | type | in, notIn, contains, doesNotContain | multiselect |
+| tags | tags | in, notIn, contains, doesNotContain | multiselect |
+| status | status | =, != | select |
+| vendor | vendor | =, !=, contains, beginsWith, endsWith | text |
+| variant_number | variant_number | =, !=, <, <=, >, >= | number |
+| publications | publications | in, notIn, contains, doesNotContain | multiselect |
+| inventory_total | inventory_total | =, !=, <, <=, >, >= | number |
 
-| Field | Collection Manager | Shopify FMS (Search) | Shopify FMS (Parquet) |
-|-------|-------------------|---------------------|----------------------|
-| `title` | ✅ | ✅ | ✅ |
-| `handle` | ✅ | ✅ | ✅ |
-| `sku` | ✅ | ✅ | ✅ |
-| `price` | ✅ | ✅ | ✅ |
-| `vendor` | ✅ | ✅ | ✅ |
-| `type` / `product_type` | ✅ | ✅ | ✅ |
-| `tags` | ✅ | ✅ | ✅ |
-| `inventory` / `inventory_total` | ✅ | ✅ | ✅ |
-| `variant_title` | ✅ | ✅ | ✅ |
-| `variant_inventory` | ✅ | ❌ | ❌ |
-| `compare_at_price` | ✅ | ❌ | ❌ (commented) |
-| `created_at` | ✅ | ✅ | ❌ (commented) |
-| `published_at` | ✅ | ✅ | ❌ (commented) |
-| `updated_at` | ✅ | ✅ | ✅ |
-| `collection_id` | ✅ | ✅ | ❌ |
-| `collection` / `collection.title` | ✅ | ❌ | ✅ |
-| `collection_handle` | ✅ | ✅ | ✅ |
-| `is_price_reduced` | ✅ | ✅ | ❌ |
-| `status` | ❌ | ✅ | ✅ |
-| `barcode` | ❌ | ✅ | ❌ (commented) |
+#### Parquet Product Variant Fields (ParquetProductVariantSearchFields)
+| Field Name | Label | Operators | Input Type |
+|------------|-------|-----------|------------|
+| id | id | =, != | text |
+| title | title | =, !=, contains, beginsWith, endsWith | text |
+| sku | sku | =, !=, contains, beginsWith, endsWith | text |
+| price | price | =, !=, <, <=, >, >= | number |
 
-### Fields Unique to Collection Manager
+#### Parquet Order Fields (ParquetOrderSearchFields)
+| Field Name | Label | Operators | Input Type |
+|------------|-------|-----------|------------|
+| id | id | =, != | text |
+| order_id | order_id | =, != | text |
+| order_created_at | order_created_at | <, <=, >, >=, between, notBetween | datetime-local |
+| order_updated_at | order_updated_at | <, <=, >, >=, between, notBetween | datetime-local |
+| customer_id | customer_id | =, != | text |
+| product_id | product_id | =, != | text |
+| collection_ids | collection_ids | in, notIn, contains, doesNotContain | multiselect |
+| variant_id | variant_id | =, != | text |
+| quantity | quantity | =, !=, <, <=, >, >= | number |
+| price | price | =, !=, <, <=, >, >= | number |
+| price_discounted | price_discounted | =, !=, <, <=, >, >= | number |
+| net_price | net_price | =, !=, <, <=, >, >= | number |
+| products_sold | products_sold | =, !=, <, <=, >, >= | number |
+| revenue | revenue | =, !=, <, <=, >, >= | number |
+| net_revenue | net_revenue | =, !=, <, <=, >, >= | number |
 
-- Analytics metrics: `buy_to_view`, `buy_to_checkout`, `buy_to_cart`, `checkout_to_view`, `checkout_to_cart`, `cart_to_view`, `checkouts`, `add_to_carts`, `views`
-- Revenue metrics: `revenue`, `net_revenue`, `products_sold`
-- Financial metrics: `cost`, `profit`, `true_profit`, `margin`, `true_margin`, `discount`, `discount_percent`
-- Inventory metrics: `variant_number`, `variant_number_available`, `variant_stock_ratio`
-- Date fields: `new_inventory_added_date`, `restock_date`
-- Other: `body_html`, `sell_through_rate`, `position` (random)
+#### Parquet GA (Google Analytics) Fields (ParquetGASearchFields)
+| Field Name | Label | Operators | Input Type |
+|------------|-------|-----------|------------|
+| id | id | =, != | text |
+| time | time | <, <=, >, >=, between, notBetween | datetime-local |
+| item_id | item_id | =, != | text |
+| item_name | item_name | =, !=, contains, beginsWith, endsWith | text |
+| item_viewed | item_viewed | =, !=, <, <=, >, >= | number |
+| item_added_to_cart | item_added_to_cart | =, !=, <, <=, >, >= | number |
+| item_checked_out | item_checked_out | =, !=, <, <=, >, >= | number |
+| item_revenue | item_revenue | =, !=, <, <=, >, >= | number |
+| views | views | =, !=, <, <=, >, >= | number |
+| add_to_carts | add_to_carts | =, !=, <, <=, >, >= | number |
+| checkouts | checkouts | =, !=, <, <=, >, >= | number |
+| revenue | revenue | =, !=, <, <=, >, >= | number |
+| cart_to_view | cart_to_view | =, !=, <, <=, >, >= | number |
+| checkout_to_view | checkout_to_view | =, !=, <, <=, >, >= | number |
+| checkout_to_cart | checkout_to_cart | =, !=, <, <=, >, >= | number |
+| buy_to_view | buy_to_view | =, !=, <, <=, >, >= | number |
+| buy_to_cart | buy_to_cart | =, !=, <, <=, >, >= | number |
+| buy_to_checkout | buy_to_checkout | =, !=, <, <=, >, >= | number |
 
-### Fields Unique to Shopify FMS
+#### Parquet Collection Fields (ParquetCollectionSearchFields)
+| Field Name | Label | Operators | Input Type |
+|------------|-------|-----------|------------|
+| id | id | =, != | text |
+| title | title | =, !=, contains, beginsWith, endsWith | text |
+| handle | handle | =, !=, contains, beginsWith, endsWith | text |
+| image | image | =, !=, contains, beginsWith, endsWith | text |
+| alt_text | alt_text | =, !=, contains, beginsWith, endsWith | text |
+| product_count | product_count | =, !=, <, <=, >, >= | number |
+| products | products | in, notIn, contains, doesNotContain | text |
+| updated_at | updated_at | <, <=, >, >=, between, notBetween | datetime-local |
+| sort_order | sort_order | =, != | select |
+| template_suffix | template_suffix | =, !=, contains, beginsWith, endsWith | text |
+| type | type | =, != | select |
+| disjunctive | disjunctive | = | select |
+| rules | rules | =, !=, contains, beginsWith, endsWith | text |
+| publication_count | publication_count | =, !=, <, <=, >, >= | number |
+| publications | publications | in, notIn, contains, doesNotContain | multiselect |
 
-#### Shopify Search Only:
-- `bundles`, `category_id`, `combined_listing_role`, `delivery_profile_id`, `error_feedback`, `gift_card`, `has_only_composites`, `has_only_default_variant`, `has_variant_with_components`, `product_configuration_owner`, `product_publication_status`, `publication_ids`, `publishable_status`, `published_status`, `tag_not`, `out_of_stock_somewhere`, `exclude_composite`, `requires_components`, `taxable`
+#### Shopify Product Fields (ShopifyProductSearchFields)
+| Field Name | Label | Operators | Input Type |
+|------------|-------|-----------|------------|
+| barcode | barcode | =, !=, contains, beginsWith, endsWith | text |
+| bundles | bundles | = | select |
+| category_id | category_id | =, !=, contains, beginsWith, endsWith | text |
+| collection_id | collection_id | =, !=, <, <=, >, >= | number |
+| combined_listing_role | combined_listing_role | = | select |
+| created_at | created_at | <, <=, >, >=, between, notBetween | datetime-local |
+| delivery_profile_id | delivery_profile_id | =, !=, <, <=, >, >= | number |
+| error_feedback | error_feedback | =, !=, contains, beginsWith, endsWith | text |
+| gift_card | gift_card | = | select |
+| handle | handle | =, !=, contains, beginsWith, endsWith | text |
+| has_only_composites | has_only_composites | = | select |
+| has_only_default_variant | has_only_default_variant | = | select |
+| has_variant_with_components | has_variant_with_components | = | select |
+| id | id | =, !=, <, <=, >, >= | number |
+| inventory_total | inventory_total | =, !=, <, <=, >, >= | number |
+| is_price_reduced | is_price_reduced | = | select |
+| out_of_stock_somewhere | out_of_stock_somewhere | = | select |
+| price | price | =, !=, <, <=, >, >= | number |
+| product_configuration_owner | product_configuration_owner | =, !=, contains, beginsWith, endsWith | text |
+| product_publication_status | product_publication_status | =, !=, contains, beginsWith, endsWith | text |
+| product_type | product_type | =, !=, contains, beginsWith, endsWith | text |
+| publication_ids | publication_ids | =, !=, contains, beginsWith, endsWith | text |
+| publishable_status | publishable_status | =, !=, contains, beginsWith, endsWith | select |
+| published_at | published_at | <, <=, >, >=, between, notBetween | datetime-local |
+| published_status | published_status | = | select |
+| sku | sku | =, !=, contains, beginsWith, endsWith | text |
+| status | status | =, !=, contains, beginsWith, endsWith | select |
+| tag | tag | =, !=, contains, beginsWith, endsWith | text |
+| tag_not | tag_not | =, !=, contains, beginsWith, endsWith | text |
+| title | title | =, !=, contains, beginsWith, endsWith | text |
+| updated_at | updated_at | <, <=, >, >=, between, notBetween | datetime-local |
+| variant_id | variant_id | =, !=, <, <=, >, >= | number |
+| variant_title | variant_title | =, !=, contains, beginsWith, endsWith | text |
+| vendor | vendor | =, !=, contains, beginsWith, endsWith | text |
 
-#### Parquet Only:
-- Collection: `image`, `alt_text`, `product_count`, `products`, `sort_order`, `template_suffix`, `disjunctive`, `rules`, `publication_count`
-- Order: `order_id`, `order_created_at`, `order_updated_at`, `customer_id`, `collection_ids`, `price_discounted`, `net_price`
-- Location: `name`, `active`
-- GA: `time`, `item_id`, `item_name`, `item_viewed`, `item_added_to_cart`, `item_checked_out`, `item_revenue`
+---
 
-### Operator Support Comparison
+## Visual Comparison Matrix
 
-| Operator | Collection Manager | Shopify FMS |
-|---------|-------------------|-------------|
-| Equals (`=`) | ✅ | ✅ |
-| Not Equals (`!=`) | ✅ | ✅ |
-| Greater Than (`>`) | ✅ | ✅ |
-| Less Than (`<`) | ✅ | ✅ |
-| Contains | ✅ | ✅ |
-| Does Not Contain | ✅ | ✅ |
-| Starts With | ✅ | ✅ |
-| Ends With | ✅ | ✅ |
-| Is Null / Is Empty | ✅ | ✅ |
-| Is Not Null / Is Not Empty | ✅ | ✅ |
-| Between | ✅ | ✅ |
-| In | ❌ | ✅ |
-| Not In | ❌ | ✅ |
-| In The Top | ✅ | ❌ |
-| In The Bottom | ✅ | ❌ |
-| In The Top (%) | ✅ | ❌ |
-| In The Bottom (%) | ✅ | ❌ |
-| Is In The Last | ✅ | ❌ |
-| Is Not In The Last | ✅ | ❌ |
+### Field Availability Comparison
 
-### Special Features
+| Collection Manager Field | CM System Column | Available in FMS? | FMS Field Name | FMS Location | Operator Match? |
+|--------------------------|-----------------|-------------------|----------------|--------------|-----------------|
+| **Analytics & Performance** |
+| Buy to view | buy_to_view | ✅ | buy_to_view | ParquetGASearchFields | ⚠️ Partial |
+| Buy to checkout | buy_to_checkout | ✅ | buy_to_checkout | ParquetGASearchFields | ⚠️ Partial |
+| Buy to cart | buy_to_cart | ✅ | buy_to_cart | ParquetGASearchFields | ⚠️ Partial |
+| Checkout to view | checkout_to_view | ✅ | checkout_to_view | ParquetGASearchFields | ⚠️ Partial |
+| Checkout to cart | checkout_to_cart | ✅ | checkout_to_cart | ParquetGASearchFields | ⚠️ Partial |
+| Cart to view | cart_to_view | ✅ | cart_to_view | ParquetGASearchFields | ⚠️ Partial |
+| Checkouts | checkouts | ✅ | checkouts | ParquetGASearchFields | ⚠️ Partial |
+| Add to carts | add_to_carts | ✅ | add_to_carts | ParquetGASearchFields | ⚠️ Partial |
+| Views | views | ✅ | views | ParquetGASearchFields | ⚠️ Partial |
+| Revenue | revenue | ✅ | revenue | ParquetOrderSearchFields, ParquetGASearchFields | ⚠️ Partial |
+| Products sold | products_sold | ✅ | products_sold | ParquetOrderSearchFields | ⚠️ Partial |
+| Net revenue | net_revenue | ✅ | net_revenue | ParquetOrderSearchFields | ⚠️ Partial |
+| **Product Information** |
+| Product title | title | ✅ | title | ParquetProductSearchFields, ShopifyProductSearchFields | ✅ Full |
+| Product sku | sku | ✅ | sku | ParquetProductVariantSearchFields, ShopifyProductSearchFields | ✅ Full |
+| Product description | body_html | ❌ | - | - | - |
+| Product type | type | ✅ | product_type | ParquetProductSearchFields, ShopifyProductSearchFields | ⚠️ Partial |
+| Product vendor | vendor | ✅ | vendor | ParquetProductSearchFields, ShopifyProductSearchFields | ✅ Full |
+| Product tag | tags | ✅ | tags | ParquetProductSearchFields | ⚠️ Partial |
+| Product price | price | ✅ | price | ParquetProductVariantSearchFields, ShopifyProductSearchFields | ⚠️ Partial |
+| Compare at price | compare_at_price | ❌ | - | - | - |
+| Product handle | handle | ✅ | handle | ParquetProductSearchFields, ShopifyProductSearchFields | ✅ Full |
+| **Variant Information** |
+| Variant title | variant_title | ✅ | variant_title | ShopifyProductSearchFields | ✅ Full |
+| Variant inventory | variant_inventory | ❌ | - | - | - |
+| Weight | variant_weight | ❌ | - | - | - |
+| **Inventory & Stock** |
+| Inventory stock | inventory | ✅ | inventory_total | ParquetProductSearchFields, ShopifyProductSearchFields | ⚠️ Partial |
+| Number of variants | variant_number | ✅ | variant_number | ParquetProductSearchFields | ⚠️ Partial |
+| Number of available variants | variant_number_available | ❌ | - | - | - |
+| Variant stock ratio | variant_stock_ratio | ❌ | - | - | - |
+| **Financial Metrics** |
+| Discount % | discount_percent | ❌ | - | - | - |
+| Discount amount | discount | ❌ | - | - | - |
+| Cost | cost | ❌ | - | - | - |
+| Profit | profit | ❌ | - | - | - |
+| True profit | true_profit | ❌ | - | - | - |
+| Margin | margin | ❌ | - | - | - |
+| True margin | true_margin | ❌ | - | - | - |
+| Sell through rate | sell_through_rate | ❌ | - | - | - |
+| **Dates** |
+| Created date | created_at | ✅ | created_at | ShopifyProductSearchFields | ⚠️ Partial |
+| Published date | published_at | ✅ | published_at | ShopifyProductSearchFields | ⚠️ Partial |
+| New inventory added date | new_inventory_added_date | ❌ | - | - | - |
+| Restocked date | restock_date | ❌ | - | - | - |
+| Last updated date | updated_at | ✅ | updated_at | ParquetCollectionSearchFields, ShopifyProductSearchFields | ⚠️ Partial |
+| **Collection Information** |
+| Collection title | collection | ✅ | title | ParquetCollectionSearchFields | ✅ Full |
+| Collection handle | collection_handle | ✅ | handle | ParquetCollectionSearchFields | ✅ Full |
+| Collection id | collection_id | ✅ | id | ParquetCollectionSearchFields, ShopifyProductSearchFields | ⚠️ Partial |
+| **Other** |
+| Random | position | ❌ | - | - | - |
+| Price reduced | is_price_reduced | ✅ | is_price_reduced | ShopifyProductSearchFields | ⚠️ Partial |
 
-#### Collection Manager
-- Supports "smart" vs "custom" collection types with different available fields
-- Plan-based field restrictions (premium fields: cost, profit, margin, etc.)
-- Special operators for variant inventory (tracked, continue selling)
-- Google Analytics integration for conversion metrics
-- Support for metafields (configurable)
+### Legend
+- ✅ **Full Match**: Field exists in both systems with compatible operators
+- ⚠️ **Partial Match**: Field exists but operators differ or are limited
+- ❌ **Not Available**: Field does not exist in FMS
 
-#### Shopify FMS
-- Two query systems: Direct Shopify API and Parquet file queries
-- Support for dataset joins (Orders, GA, Variants, Inventory, Locations)
-- Dynamic dropdown population from actual data
-- Timeseries filtering for time-based data
-- Aggregation support for joined datasets
-- Multiselect support for array fields
+### Operator Compatibility
+
+| CM Operator | CM System | FMS Equivalent | Match Status |
+|-------------|-----------|----------------|-------------|
+| is equal to | == | = | ✅ Match |
+| is not equal to | != | != | ✅ Match |
+| is greater than | > | > | ✅ Match |
+| is less than | < | < | ✅ Match |
+| contains | contains | contains | ✅ Match |
+| doesn't contain | not contain | doesNotContain | ⚠️ Similar |
+| starts with | starts with | beginsWith | ✅ Match |
+| ends with | ends with | endsWith | ✅ Match |
+| is in the last | > | > (with date) | ⚠️ Similar |
+| is not in the last | < | < (with date) | ⚠️ Similar |
+| in the top | in the top | - | ❌ Not Available |
+| in the bottom | in the bottom | - | ❌ Not Available |
+| is not empty | is set | isNotNull | ⚠️ Similar |
+| is empty | is not set | isNull | ⚠️ Similar |
+| between | between | between | ✅ Match |
+
+---
+
+## Summary
+
+### Fields Available in Both Systems
+- **Product Information**: title, sku, vendor, handle, product_type
+- **Analytics**: views, add_to_carts, checkouts, revenue, products_sold, net_revenue, conversion metrics
+- **Inventory**: inventory_total (as inventory)
+- **Dates**: created_at, published_at, updated_at
+- **Collections**: title, handle, id
+
+### Fields Only in Collection Manager
+- **Financial**: cost, profit, true_profit, margin, true_margin, discount, discount_percent
+- **Variant Details**: variant_inventory, variant_weight, variant_number_available, variant_stock_ratio
+- **Dates**: new_inventory_added_date, restock_date
+- **Other**: body_html, sell_through_rate, position (random)
+
+### Fields Only in FMS
+- **Shopify Specific**: barcode, bundles, category_id, delivery_profile_id, gift_card, publication_ids
+- **Advanced Inventory**: inventory_levels, locations
+- **GA Raw Data**: item_viewed, item_added_to_cart, item_checked_out, item_revenue
+- **Order Details**: order_id, customer_id, quantity, price_discounted, net_price
+
+### Operator Differences
+- **Collection Manager** has special operators: "in the top", "in the bottom" (not in FMS)
+- **FMS** has additional operators: "in", "notIn", "notBetween" (not in Collection Manager)
+- **FMS** has more granular numeric operators: <=, >= (Collection Manager only has <, >)
+- **FMS** has explicit null operators: isNull, isNotNull (Collection Manager uses "is set"/"is not set")
 
 ---
 
 ## Recommendations
 
-1. **For Product Filtering**: Collection Manager offers more comprehensive analytics and financial metrics, while Shopify FMS provides better integration with Shopify's native search capabilities.
-
-2. **For Collection Filtering**: Shopify FMS Parquet filters provide more collection-specific metadata (image, sort_order, etc.), while Collection Manager focuses on collection membership filtering.
-
-3. **For Analytics**: Collection Manager has superior analytics integration with Google Analytics and order-based metrics.
-
-4. **For Real-time Data**: Shopify FMS Search filters provide real-time data directly from Shopify, while Parquet filters work with cached data.
-
-5. **For Complex Queries**: Shopify FMS supports more complex query structures with joins and aggregations, while Collection Manager focuses on rule-based filtering.
+1. **For Migration**: Fields with ✅ Full Match can be directly migrated
+2. **For Partial Matches**: Review operator differences and implement conversion logic
+3. **For Missing Fields**: Consider if these fields need to be added to FMS or if alternative fields can be used
+4. **For Special Operators**: "in the top" and "in the bottom" may need custom implementation in FMS
 
 ---
 
-## Notes
-
-- Collection Manager excludes certain fields in "smart" collection mode
-- Shopify FMS has many commented-out fields in Parquet filters that may be enabled in the future
-- Both systems support custom metafields, though implementation differs
-- Collection Manager has plan-based restrictions for premium features
-- Shopify FMS Parquet filters support dynamic value population from actual data
+*Last Updated: Generated from codebase analysis*
+*Collection Manager Version: Based on constants.py*
+*FMS Version: Based on ouiteo/fms/filters/*
 
